@@ -4,14 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devay.wid.data.repo.TodoRepo
 import com.devay.wid.data.room.Todo
+import com.devay.wid.util.Route
 import com.devay.wid.util.SideMenu
+import com.devay.wid.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -56,6 +60,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
     fun updateSelected(updatedCategory: SideMenu) {
         _selected.value = updatedCategory
     }
@@ -67,6 +74,12 @@ class HomeViewModel @Inject constructor(
                     completed = !todo.completed
                 )
             )
+        }
+    }
+
+    fun navigate() {
+        viewModelScope.launch {
+            _uiEvent.send(UiEvent.Navigate(Route.AddEditScreen))
         }
     }
 

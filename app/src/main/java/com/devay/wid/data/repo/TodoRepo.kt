@@ -11,6 +11,8 @@ interface TodoRepo {
 
     suspend fun search(text: String): List<Todo>
 
+    suspend fun getById(id: Int): Todo?
+
     fun getAll(): Flow<List<Todo>>
 
     fun getAllWithComplete(): Flow<List<Todo>>

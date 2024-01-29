@@ -18,6 +18,9 @@ interface TodoDao {
     @Query("SELECT * FROM Todo WHERE Todo.title LIKE :text")
     suspend fun search(text: String): List<Todo>
 
+    @Query("SELECT * FROM Todo WHERE Todo.id = :id")
+    suspend fun getById(id: Int): Todo?
+
     @Query("SELECT * FROM Todo WHERE Todo.trashed = 0 AND Todo.completed = 0")
     fun getAll(): Flow<List<Todo>>
 

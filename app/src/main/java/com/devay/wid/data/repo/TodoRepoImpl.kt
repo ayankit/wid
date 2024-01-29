@@ -20,6 +20,10 @@ class TodoRepoImpl(
         return dao.search(text)
     }
 
+    override suspend fun getById(id: Int): Todo? {
+        return dao.getById(id)
+    }
+
     override fun getAll(): Flow<List<Todo>> {
         return dao.getAll().filterNotNull()
     }

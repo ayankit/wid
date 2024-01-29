@@ -13,6 +13,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,20 +24,31 @@ import com.devay.wid.screens.homeScreen.components.IconBox
 import com.devay.wid.screens.homeScreen.components.SideMenuBar
 import com.devay.wid.screens.homeScreen.components.TodoItemList
 import com.devay.wid.screens.homeScreen.components.TopBar
+import com.devay.wid.util.UiEvent
 
 
 @Composable
 fun HomeScreen(
+    onNavigate: (UiEvent.Navigate) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
     val tasks = viewModel.tasks.collectAsState(initial = emptyList())
     val selected = viewModel.selected.collectAsState()
 
+    LaunchedEffect(true) {
+        viewModel.uiEvent.collect {event ->
+            when (event) {
+                is UiEvent.Navigate -> onNavigate(event)
+                else -> Unit
+            }
+        }
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { viewModel.navigate() },
                 elevation = FloatingActionButtonDefaults.elevation(1.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {

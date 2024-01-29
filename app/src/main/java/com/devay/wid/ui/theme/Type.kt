@@ -11,23 +11,23 @@ import com.devay.wid.R
 val inraiSans = FontFamily(
     Font(R.font.inraisans_regular, weight = FontWeight.Normal),
     Font(R.font.inriasans_light, weight = FontWeight.Light),
-    Font(R.font.inriasans_bold, weight = FontWeight.Normal)
+    Font(R.font.inriasans_bold, weight = FontWeight.Bold)
 )
 
-val hammerSmith = FontFamily( Font(R.font.hammersmith_regular, weight = FontWeight.Bold) )
+val hammerSmith = FontFamily( Font(R.font.hammersmith_regular, weight = FontWeight.Normal) )
 
 // Set of Material typography styles to start with
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = hammerSmith,
+        fontFamily = inraiSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 50.sp,
+        fontSize = 60.sp,
         letterSpacing = 0.5.sp,
     ),
     headlineLarge = TextStyle(
         fontFamily = hammerSmith,
         fontWeight = FontWeight.Normal,
-        fontSize = 40.sp,
+        fontSize = 50.sp,
         letterSpacing = 0.5.sp
     ),
     headlineMedium = TextStyle(
