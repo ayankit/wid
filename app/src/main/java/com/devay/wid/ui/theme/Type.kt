@@ -46,6 +46,16 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp
     ),
+    bodyMedium = TextStyle(
+        fontFamily = inraiSans,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = inraiSans,
+        fontWeight = FontWeight.Light,
+        fontSize = 16.sp
+    )
     /* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,

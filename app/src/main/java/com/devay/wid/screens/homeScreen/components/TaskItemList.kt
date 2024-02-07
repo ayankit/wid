@@ -2,7 +2,7 @@ package com.devay.wid.screens.homeScreen.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.devay.wid.data.room.Todo
 
@@ -26,8 +28,12 @@ import com.devay.wid.data.room.Todo
 fun TodoItemList(
     tasks: List<Todo>,
     onClick: (Todo) -> Unit,
+    onLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val haptics = LocalHapticFeedback.current
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         modifier = modifier
@@ -46,7 +52,6 @@ fun TodoItemList(
             val notCompletedColor = MaterialTheme.colorScheme.onBackground
             val completedColor = MaterialTheme.colorScheme.onBackground.copy(0.5f)
 
-
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.bodyLarge,
@@ -61,6 +66,17 @@ fun TodoItemList(
                 },
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
+                    .animateItemPlacement()
+                    .combinedClickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        enabled = true,
+                        onClick = { onClick(task) },
+                        onLongClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onLongClick(task.id!!)
+                        },
+                    )
                     .drawWithContent {
                         drawContent()
 
@@ -76,19 +92,11 @@ fun TodoItemList(
                                     strokeWidth = strokeWidth,
                                     start = Offset(-60f, verticalCenter),
                                     end = Offset(lineList[i - 1] + 40f, verticalCenter),
-
-                                    )
+                                )
                             }
                         }
-
                     }
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) { onClick(task) }
-                    .animateItemPlacement()
             )
         }
-
     }
 }

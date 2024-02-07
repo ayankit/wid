@@ -84,5 +84,10 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
+    // Date and Time picker
+    implementation("com.github.vsnappy1:ComposeDatePicker:2.2.0")
+
+    // Constraint Layout
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
 }

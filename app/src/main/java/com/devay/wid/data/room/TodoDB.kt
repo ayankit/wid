@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(entities = [Todo::class], version = 1)
-@TypeConverters(DateConverter::class)
+@TypeConverters(DateConverter::class, TimeConverter::class, DateTimeConverter::class)
 abstract class TodoDB: RoomDatabase() {
     abstract val dao: TodoDao
 }

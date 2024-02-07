@@ -1,0 +1,25 @@
+{
+  ConstraintSets: {
+    start: {
+      text1: {
+        start: ['parent', 'start', 25],
+        top: ['parent', 'top', 40],
+      },
+      text2: {
+        start: ['parent', 'start', 25],
+        top: ['text1', 'bottom', 0],
+      }
+    },
+    end: {
+      text1: {
+        start: ['parent', 'start', 25],
+        top: ['parent', 'top', 40],
+      },
+      text2: {
+        start: ['text1', 'end', 12],
+        top: ['text1', 'top', 0],
+        bottom: ['text1', 'bottom', 0],
+      }
+    }
+  }
+}

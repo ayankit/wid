@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -48,7 +46,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     ) {
-                        HomeScreen(onNavigate = {
+                        HomeScreen( onNavigate = {
                             navController.navigate(it.route)
                         })
                     }
