@@ -70,6 +70,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun toggleTrash(task: Todo) {
+        viewModelScope.launch {
+            repo.add(
+                task.copy(
+                    trashed = !task.trashed
+                )
+            )
+        }
+    }
+
 }
 
 data class Navigate(val route: String)

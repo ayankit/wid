@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,7 +77,7 @@ fun DateSelector(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
 
@@ -93,7 +95,7 @@ fun DateSelector(
                 val clickEnabled = when (option) {
                     SelectedOption.TODAY -> dueTime?.isBefore(LocalTime.now()) != true
                     SelectedOption.TOMORROW -> true
-                    SelectedOption.SELECT -> !(dueDate == LocalDate.now() || dueDate == LocalDate.now().plusDays(1))
+                    SelectedOption.SELECT -> !(dueDate == LocalDate.now() || dueDate == LocalDate.now().plusDays(1) || dueDate == null)
                     else -> false
                 }
 
@@ -102,7 +104,8 @@ fun DateSelector(
                 else MaterialTheme.colorScheme.onBackground.copy(0.5f)
 
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.defaultMinSize(minWidth = 80.dp)
                 ) {
 
                     Text(
@@ -112,11 +115,13 @@ fun DateSelector(
                             fontFamily = hammerSmith,
                             fontSize = 18.sp
                         ),
-                        modifier = Modifier.clickable(interactionSource, null, clickEnabled) {
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .clickable(interactionSource, null, clickEnabled) {
                             onClick( when (option) {
                                 SelectedOption.TODAY -> if(selectedDateOption == SelectedOption.TODAY) SelectedOption.NONE else SelectedOption.TODAY
                                 SelectedOption.TOMORROW -> if(selectedDateOption == SelectedOption.TOMORROW) SelectedOption.NONE else SelectedOption.TOMORROW
-                                SelectedOption.SELECT -> if(selectedDateOption == SelectedOption.SELECT) SelectedOption.NONE else SelectedOption.SELECT
+                                SelectedOption.SELECT -> SelectedOption.NONE
                                 else -> SelectedOption.NONE
                             })
                         }

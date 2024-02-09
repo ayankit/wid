@@ -72,6 +72,7 @@ fun HomeScreen(
                 TodoItemList(
                     tasks = tasks.value,
                     onClick = { task -> viewModel.updateStatus(task) },
+                    toggleTrash = { task -> viewModel.toggleTrash(task)},
                     onLongClick = { onNavigate(Navigate(Route.AddEditScreen + "?taskId=$it")) }
                 )
             }

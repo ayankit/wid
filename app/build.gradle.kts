@@ -90,4 +90,7 @@ dependencies {
     // Constraint Layout
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
+    // Gesture
+    implementation("androidx.compose.foundation:foundation:1.6.1")
+
 }

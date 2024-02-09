@@ -19,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 
 
@@ -39,7 +40,7 @@ class AddEditViewModel @Inject constructor(
     var editMode by mutableStateOf(false)
         private set
 
-    var selectedDateOption by mutableStateOf(SelectedOption.TODAY)
+    var selectedDateOption by mutableStateOf(SelectedOption.NONE)
         private set
 
     private var ignoreMatches = mutableStateListOf<String>()
@@ -71,13 +72,24 @@ class AddEditViewModel @Inject constructor(
         if (selected == SelectedOption.TOMORROW) {
             title = title.copy(text = title.text.removeRange(parsedDateTime.dateRange))
         }
+        if (selected == SelectedOption.TODAY && parsedDateTime.time?.isAfter(LocalTime.now()) == true) {
+            title = title.copy(text = title.text.removeRange(parsedDateTime.dateRange))
+        }
+        if (selected == SelectedOption.NONE) {
+            title = title.copy(text = if (parsedDateTime.dateRange.last > parsedDateTime.timeRange.last) {
+                title.text.removeRange(parsedDateTime.dateRange).removeRange(parsedDateTime.timeRange)
+            } else {
+                title.text.removeRange(parsedDateTime.timeRange).removeRange(parsedDateTime.dateRange)
+            })
+        }
 
         parsedDateTime = parsedDateTime.copy(
             date = when (selected) {
                 SelectedOption.TODAY -> LocalDate.now()
                 SelectedOption.TOMORROW -> LocalDate.now().plusDays(1)
                 else -> null
-            }
+            },
+            time = if (selected == SelectedOption.NONE) null else parsedDateTime.time
         )
         updateDate()
     }
