@@ -25,17 +25,19 @@ fun SideMenuBar(selected: SideMenu, onChange: (SideMenu) -> Unit) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround,
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = Modifier
             .fillMaxHeight()
+            .padding(top = 20.dp)
     ) {
-        SideMenu.entries.forEach { category ->
+
+        SideMenu.entries.filter { it != SideMenu.TRASH }.forEach { category ->
 
             val boxColor: Color
             val textColor: Color
 
             if (selected == category) {
-                boxColor = MaterialTheme.colorScheme.primary
+                boxColor = MaterialTheme.colorScheme.primary.copy(0.8f)
                 textColor = MaterialTheme.colorScheme.onPrimary
             } else {
                 boxColor = MaterialTheme.colorScheme.background

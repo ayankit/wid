@@ -1,13 +1,20 @@
 package com.devay.wid.screens.homeScreen.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -20,108 +27,162 @@ import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.devay.wid.R
 import com.devay.wid.data.room.Todo
+import com.vsnappy1.component.AnimatedFadeVisibility
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TodoItemList(
     tasks: List<Todo>,
+    trashShown: Boolean,
     onClick: (Todo) -> Unit,
     onLongClick: (Int) -> Unit,
     toggleTrash: (Todo) -> Unit,
+    deleteTask: (Todo) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
-    val haptics = LocalHapticFeedback.current
+    val swipeDirections = when(trashShown) {
+        true -> setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart)
+        false -> setOf(DismissDirection.StartToEnd)
+    }
 
-    LazyColumn(
-        state = rememberLazyListState(),
-        verticalArrangement = Arrangement.spacedBy(30.dp),
-        modifier = modifier
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    val backgroundColor = MaterialTheme.colorScheme.primary.copy(0.1f)
+
+    val deleteComposition = rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            R.raw.delete_animation
+        )
+    )
+
+    val restoreComposition = rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            R.raw.restore
+        )
+    )
+
+    Box(
+        modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(topStart = 15.dp))
-            .background(MaterialTheme.colorScheme.primary.copy(0.1f))
-            .padding(vertical = 30.dp)
+            .background(backgroundColor)
+            .padding(vertical = 30.dp),
+        contentAlignment = Alignment.Center
     ) {
-
-        items(tasks, key = { it.id!! }) { task ->
-
-            var lineCount = 1
-            val lineList = mutableListOf<Float>()
-            val interactionSource = remember { MutableInteractionSource() }
-            val primaryColor = MaterialTheme.colorScheme.primary
-            val notCompletedColor = MaterialTheme.colorScheme.onBackground
-            val completedColor = MaterialTheme.colorScheme.onBackground.copy(0.5f)
-
-            val state = rememberDismissState(
-                confirmValueChange = {
-                    if (it == DismissValue.DismissedToEnd) {
-                        toggleTrash(task)
-                    }
-                    true
-                }
+        AnimatedFadeVisibility(visible = tasks.isEmpty() || tasks.dropLast(1).isEmpty()) {
+            Text(
+                text = "Nothing here!",
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground.copy(0.5f)
             )
+        }
 
-            SwipeToDismiss(
-                state = state,
-                background = { },
-                modifier = Modifier.fillMaxWidth().animateItemPlacement(),
-                directions = setOf(DismissDirection.StartToEnd),
-                dismissContent = {
-                    Text(
-                        text = task.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = if (task.completed) completedColor else notCompletedColor,
-                        onTextLayout = {
-                            if (task.completed) {
-                                lineCount = it.lineCount
-                                for (i in 0..<lineCount) {
-                                    lineList.add(it.getLineRight(i))
+        AnimatedContent(
+            targetState = tasks,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            contentKey = { tasks.lastOrNull()?.id ?: 0 },
+            label = "",
+        ) {tasks ->
+
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = modifier.fillMaxSize()
+            ) {
+
+                val dummyRemovedTasks = if(trashShown) tasks else tasks.dropLast(1)
+
+                items(dummyRemovedTasks, key = { it.id!! }) { task ->
+
+                    val dismissState = rememberDismissState(
+                        confirmValueChange = {
+                            if (it == DismissValue.DismissedToEnd) {
+                                if (trashShown) deleteTask(task)
+                                else toggleTrash(task)
+                            }
+                            if (it == DismissValue.DismissedToStart) {
+                                if (trashShown) toggleTrash(task)
+                            }
+                            true
+                        },
+                        positionalThreshold = { totalDistance -> totalDistance / 2f }
+                    )
+
+                    val offset = try {
+                        dismissState.requireOffset() / 500f
+                    } catch (_: IllegalStateException) {
+                        0f
+                    }
+
+                    val coercedOffset = offset.coerceIn(-1f, 1f)
+                    val animatedTextColor by animateColorAsState(
+                        targetValue = when (coercedOffset) {
+                            in -0.9f..-0.1f -> Color(0xFF288052)
+                            in 0.1f..0.9f -> Color(0xFFCF2D40)
+                            else -> onBackground
+                        }, label = ""
+                    )
+
+                    SwipeToDismiss(
+                        state = dismissState,
+                        background = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                LottieAnimation(
+                                    composition = deleteComposition.value,
+                                    progress = { offset.coerceIn(0f, 1f) },
+                                    alignment = Alignment.CenterStart,
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(if (trashShown) 0.4f else 0.5f)
+                                )
+
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                if (trashShown) {
+                                    LottieAnimation(
+                                        composition = restoreComposition.value,
+                                        progress = { offset.coerceIn(-1f, 0f).absoluteValue },
+                                        modifier = Modifier
+                                            .requiredHeightIn(max = 50.dp)
+                                            .fillMaxWidth(0.3f)
+                                    )
                                 }
                             }
                         },
                         modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .combinedClickable(
-                                interactionSource = interactionSource,
-                                indication = null,
-                                enabled = true,
-                                onClick = { onClick(task) },
-                                onLongClick = {
-                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onLongClick(task.id!!)
-                                },
+                            .fillMaxWidth()
+                            .animateItemPlacement(),
+                        directions = swipeDirections,
+                        dismissContent = {
+
+                            TaskItem(
+                                task = task,
+                                textColor = animatedTextColor,
+                                onClick = { onClick(it) },
+                                onLongClick = { onLongClick(it) }
                             )
-                            .drawWithContent {
-                                drawContent()
 
-                                if (task.completed) {
-                                    val strokeWidth = 1.5.dp.toPx()
-                                    val center = size.height / (lineCount)
+                        })
 
-                                    for (i in 1..lineCount) {
-                                        val verticalCenter = i * center - center / 2 + 5f
-
-                                        drawLine(
-                                            color = primaryColor,
-                                            strokeWidth = strokeWidth,
-                                            start = Offset(-60f, verticalCenter),
-                                            end = Offset(lineList[i - 1] + 40f, verticalCenter),
-                                        )
-                                    }
-                                }
-                            }
-                    )
-            })
-
+                }
+            }
         }
+
     }
+
 }
+

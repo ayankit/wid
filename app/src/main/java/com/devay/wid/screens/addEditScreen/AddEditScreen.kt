@@ -67,12 +67,12 @@ fun AddEditScreen(
             ) {
                 Text(
                     text = if (editMode) "Edit" else "Add",
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.displayMedium,
                     modifier = Modifier.layoutId("text1")
                 )
                 Text(
                     text = if (editMode) "task" else "new task",
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.displayMedium,
                     modifier = Modifier.layoutId("text2")
                 )
             }

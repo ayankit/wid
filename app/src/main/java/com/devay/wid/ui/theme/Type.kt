@@ -24,16 +24,27 @@ val Typography = Typography(
         fontSize = 60.sp,
         letterSpacing = 0.5.sp,
     ),
-    headlineLarge = TextStyle(
+    displayMedium = TextStyle(
         fontFamily = hammerSmith,
         fontWeight = FontWeight.Normal,
         fontSize = 50.sp,
+        letterSpacing = 0.5.sp,
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = hammerSmith,
+        fontWeight = FontWeight.Normal,
+        fontSize = 35.sp,
         letterSpacing = 0.5.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = hammerSmith,
         fontWeight = FontWeight.Normal,
         fontSize = 24.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = hammerSmith,
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp
     ),
     titleLarge = TextStyle(
         fontFamily = hammerSmith,

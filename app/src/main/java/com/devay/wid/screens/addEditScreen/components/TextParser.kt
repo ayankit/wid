@@ -18,11 +18,24 @@ fun parseDate(
     var dateRange = IntRange.EMPTY
     var timeRange = IntRange.EMPTY
 
-    val regexDate = Regex("\\s(\\d{1,2})\\s?([a-z|A-Z]{3,9})\\b")
+    val regexDate = Regex("\\b\\s(\\d{1,2})\\s?([a-z|A-Z]{3,9})\\b")
     val matchDate = regexDate.find(text)
 
-    val regexTime = Regex("\\s(\\d{1,2})(?::|\\s)?(0{0,2}|[1-9]|[1-5][0-9])?\\s?(?i)(am|pm)")
+    val regexTime = Regex("\\b\\s(\\d{1,2})(?::|\\s)?(0{0,2}|[1-9]|[1-5][0-9])?\\s?(?i)(am|pm)\\b")
     val matchTime = regexTime.find(text)
+
+    val regexRelativeDate = Regex("\\b\\s(?i)(today|tomorrow)\\b")
+    val matchRelativeDate = regexRelativeDate.find(text)
+
+    matchRelativeDate?.let {matchResult ->
+        println("zzz ${matchResult.groupValues}")
+        date = when (matchResult.groupValues[1]) {
+            "today" -> LocalDate.now()
+            "tomorrow" -> LocalDate.now().plusDays(1)
+            else -> null
+        }
+        dateRange = matchResult.range
+    }
 
     matchDate?.let { matchResult ->
 
@@ -80,7 +93,7 @@ fun parseDate(
             }
 
             if (date == LocalDate.now()) {
-                date = if (matchDate == null) {
+                date = if (matchDate == null && matchRelativeDate == null) {
                     if (time?.isBefore(LocalTime.now()) == true) {
                         LocalDate.now().plusDays(1)
                     } else {

@@ -5,6 +5,7 @@ enum class SideMenu {
     TODAY,
     TOMORROW,
     LATER,
-    GROCERY
+    PENDING,
+    TRASH
 
 }

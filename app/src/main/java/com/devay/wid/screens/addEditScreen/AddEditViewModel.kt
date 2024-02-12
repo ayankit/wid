@@ -40,7 +40,7 @@ class AddEditViewModel @Inject constructor(
     var editMode by mutableStateOf(false)
         private set
 
-    var selectedDateOption by mutableStateOf(SelectedOption.NONE)
+    var selectedDateOption by mutableStateOf(SelectedOption.TODAY)
         private set
 
     private var ignoreMatches = mutableStateListOf<String>()
